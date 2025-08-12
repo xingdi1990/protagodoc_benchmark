@@ -1,0 +1,3 @@
+keeutive mansion, Washington City,<br>January 10th 1864. Major General Hitchcock, Commissioner of Exchanges,<br>is anthorized and directed to offer Brigadier General Trimble,<br>now a prisoner of war in Fort Mettenry, in exchange for Majoi White, who is held as a processed at Richmond. Ite is also directed to vend forward the offer of enchange by Henry M. Warfield, Esq. of Balkmon, under aflag of truce, ant give him a pass to City Birt.<br>Abraham Sincoln  $\cdots \cdots$ 
+
+![](_page_0_Picture_1.jpeg)

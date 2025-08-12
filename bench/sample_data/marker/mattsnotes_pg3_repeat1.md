@@ -1,0 +1,1 @@
+ARCH + TRAINING -Pick Arch like OLMo-IB ~OR~ replicable a 30 model - Fallow standard LR Slow  $Eval$ : Hacky Nonsense for Now

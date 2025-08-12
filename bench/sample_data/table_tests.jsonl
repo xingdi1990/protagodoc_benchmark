@@ -1,6 +1,0 @@
-{"pdf": "f_04OhhGz1.pdf", "page": 1, "id": "baseline_f_04OhhGz1", "type": "baseline", "checked": "verified"}
-{"pdf": "f_06NvENTw.pdf", "page": 1, "id": "baseline_f_06NvENTw", "type": "baseline", "checked": "verified"}
-{"pdf": "f_06Y5279t.pdf", "page": 1, "id": "baseline_f_06Y5279t", "type": "baseline", "checked": "verified"}
-{"pdf": "f_04OhhGz1.pdf", "page": 1, "id": "table_extraction_f_04OhhGz1", "type": "present", "checked": "verified", "text": "table", "case_sensitive": false}
-{"pdf": "f_06NvENTw.pdf", "page": 1, "id": "table_extraction_f_06NvENTw", "type": "present", "checked": "verified", "text": "table", "case_sensitive": false}
-{"pdf": "f_06Y5279t.pdf", "page": 1, "id": "table_extraction_f_06Y5279t", "type": "present", "checked": "verified", "text": "table", "case_sensitive": false}
