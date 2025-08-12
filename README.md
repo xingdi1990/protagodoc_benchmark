@@ -20,6 +20,13 @@ This project uses Azure Document Intelligence API. You'll need to set up your cr
 
 3. **Never commit `.env` to git** - it's already in `.gitignore` for security.
 
+4. **Install required dependencies:**
+   ```bash
+   pip install python-dotenv azure-ai-documentintelligence
+   ```
+
+5. **Your notebook is ready!** The `azure_markdown.ipynb` script will automatically load your environment variables and securely connect to Azure Document Intelligence.
+
 # Data Preparation
 ### Orbit Dataset
 
