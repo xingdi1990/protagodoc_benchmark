@@ -1,4 +1,25 @@
 
+# Setup
+
+## Environment Configuration
+
+This project uses Azure Document Intelligence API. You'll need to set up your credentials:
+
+1. **Copy the environment template:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` with your actual Azure credentials:**
+   - Get your endpoint and API key from [Azure Portal](https://portal.azure.com)
+   - Replace the placeholder values in `.env`:
+     ```bash
+     AZURE_DI_ENDPOINT=https://your-actual-resource.cognitiveservices.azure.com/
+     AZURE_DI_KEY=your-actual-api-key-here
+     ```
+
+3. **Never commit `.env` to git** - it's already in `.gitignore` for security.
+
 # Data Preparation
 ### Orbit Dataset
 
