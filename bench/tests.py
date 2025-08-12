@@ -13,15 +13,9 @@ from fuzzysearch import find_near_matches
 from rapidfuzz import fuzz
 from tqdm import tqdm
 
-try:
-    from olmocr.repeatdetect import RepeatDetector
-except ImportError:
-    from .repeatdetect import RepeatDetector
+from olmocr.repeatdetect import RepeatDetector
 
-try:
-    from .katex.render import compare_rendered_equations, render_equation
-except ImportError:
-    from katex.render import compare_rendered_equations, render_equation
+from .katex.render import compare_rendered_equations, render_equation
 
 
 @dataclass

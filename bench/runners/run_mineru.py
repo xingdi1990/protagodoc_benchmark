@@ -1,98 +1,74 @@
-#!/usr/bin/env python3
-"""
-MinerU Runner for protagodoc_benchmark
-
-This runner integrates MinerU with the benchmark framework.
-"""
-
 import os
-import sys
-import subprocess
 import tempfile
-import json
-from pathlib import Path
-import argparse
+
+from magic_pdf.config.enums import SupportedPdfParseMethod
+from magic_pdf.data.data_reader_writer import FileBasedDataReader, FileBasedDataWriter
+from magic_pdf.data.dataset import PymuDocDataset
+from magic_pdf.model.doc_analyze_by_custom_model import doc_analyze
+from pypdf import PdfReader, PdfWriter
 
 
-def mineru_ocr(pdf_path: str, **kwargs) -> str:
-    """
-    Process a PDF with MinerU and return markdown.
-    
-    Args:
-        pdf_path: Path to the PDF file
-        **kwargs: Additional arguments (unused but kept for compatibility)
-        
-    Returns:
-        str: Markdown content extracted from the PDF
-    """
-    pdf_path = Path(pdf_path)
-    
-    # Create temporary directory for MinerU output
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_output = Path(temp_dir) / "output"
-        temp_output.mkdir(exist_ok=True)
-        
-        try:
-            # Run MinerU command
-            cmd = [
-                "magic-pdf",
-                "-p", str(pdf_path),
-                "-o", str(temp_output),
-                "-m", "ocr"
-            ]
-            
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=300  # 5 minute timeout
-            )
-            
-            if result.returncode != 0:
-                print(f"MinerU failed for {pdf_path}: {result.stderr}")
-                return ""
-            
-            # Find the markdown file in the output
-            pdf_stem = pdf_path.stem
-            markdown_files = list(temp_output.rglob(f"{pdf_stem}*.md"))
-            
-            if not markdown_files:
-                # Try to find any markdown file
-                markdown_files = list(temp_output.rglob("*.md"))
-            
-            if markdown_files:
-                with open(markdown_files[0], 'r', encoding='utf-8') as f:
-                    return f.read()
-            else:
-                print(f"No markdown output found for {pdf_path}")
-                return ""
-                
-        except subprocess.TimeoutExpired:
-            print(f"MinerU timed out for {pdf_path}")
-            return ""
-        except Exception as e:
-            print(f"Error processing {pdf_path} with MinerU: {e}")
-            return ""
+def run_mineru(pdf_path: str, page_num: int = 1) -> str:
+    output_folder = tempfile.TemporaryDirectory()
+    image_output_folder = tempfile.TemporaryDirectory()
 
+    # Initialize writers (same for all PDFs)
+    image_writer = FileBasedDataWriter(image_output_folder.name)
+    md_writer = FileBasedDataWriter(output_folder.name)
 
-def main():
-    """Command-line interface for MinerU runner."""
-    parser = argparse.ArgumentParser(description="Run MinerU on PDFs")
-    parser.add_argument("pdf_path", help="Path to PDF file")
-    parser.add_argument("--output", help="Output path for markdown file")
-    
-    args = parser.parse_args()
-    
-    # Process the PDF
-    markdown_content = mineru_ocr(args.pdf_path)
-    
-    if args.output:
-        with open(args.output, 'w', encoding='utf-8') as f:
-            f.write(markdown_content)
-        print(f"Saved markdown to: {args.output}")
+    if page_num > 0:  # If a specific page is requested
+        reader = PdfReader(pdf_path)
+
+        # Check if the requested page exists
+        if page_num > len(reader.pages):
+            raise ValueError(f"Page {page_num} does not exist in the PDF. PDF has {len(reader.pages)} pages.")
+
+        # Create a new PDF with just the requested page
+        writer = PdfWriter()
+        # pypdf uses 0-based indexing, so subtract 1 from page_num
+        writer.add_page(reader.pages[page_num - 1])
+
+        # Save the extracted page to a temporary file
+        temp_file = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+        temp_file.close()  # Close the file but keep the name
+
+        with open(temp_file.name, "wb") as output_pdf:
+            writer.write(output_pdf)
+
+        pdf_to_process = temp_file.name
     else:
-        print(markdown_content)
+        pdf_to_process = pdf_path
 
+    try:
+        # Read the PDF file bytes
+        reader = FileBasedDataReader("")
+        pdf_bytes = reader.read(pdf_to_process)
 
-if __name__ == "__main__":
-    main()
+        # Create dataset instance
+        ds = PymuDocDataset(pdf_bytes)
+
+        # Inference: decide whether to run OCR mode based on dataset classification
+        if ds.classify() == SupportedPdfParseMethod.OCR:
+            infer_result = ds.apply(doc_analyze, ocr=True)
+            pipe_result = infer_result.pipe_ocr_mode(image_writer)
+        else:
+            infer_result = ds.apply(doc_analyze, ocr=False)
+            pipe_result = infer_result.pipe_txt_mode(image_writer)
+
+        # Generate markdown content; the image directory is the basename of the images output folder
+        image_dir_basename = os.path.basename(image_output_folder.name)
+        # md_content = pipe_result.get_markdown(image_dir_basename)
+
+        # Dump markdown file
+        with tempfile.NamedTemporaryFile("w+", suffix="md") as tf:
+            pipe_result.dump_md(md_writer, tf.name, image_dir_basename)
+            tf.flush()
+
+            tf.seek(0)
+            md_data = tf.read()
+
+        return md_data
+    finally:
+        # Clean up the temporary file if it was created
+        if temp_file and os.path.exists(temp_file.name):
+            os.unlink(temp_file.name)

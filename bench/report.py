@@ -4,13 +4,9 @@ from typing import Dict, List, Tuple
 
 from tqdm import tqdm
 
-# Removed olmocr dependency for standalone operation
-# from olmocr.data.renderpdf import render_pdf_to_base64webp
+from olmocr.data.renderpdf import render_pdf_to_base64webp
 
-try:
-    from .tests import BasePDFTest
-except ImportError:
-    from tests import BasePDFTest
+from .tests import BasePDFTest
 
 
 def generate_html_report(
@@ -189,9 +185,14 @@ def generate_html_report(
             <strong>Explanation:</strong> {explanation}
         </div>\n"""
 
-                    # PDF rendering disabled (requires olmocr dependencies)
-                    html += """        <h4>PDF Render:</h4>\n"""
-                    html += """        <p>PDF rendering disabled in this version</p>\n"""
+                    # Render PDF page
+                    pdf_path = os.path.join(pdf_folder, pdf_name)
+                    try:
+                        html += """        <h4>PDF Render:</h4>\n"""
+                        image_data = render_pdf_to_base64webp(pdf_path, page, 1024)
+                        html += f"""        <img class="pdf-image" alt="PDF Page {page}" src="data:image/webp;base64,{image_data}" />\n"""
+                    except Exception as e:
+                        html += f"""        <p>Error rendering PDF: {str(e)}</p>\n"""
 
                     # Get the Markdown content for this page
                     md_content = None

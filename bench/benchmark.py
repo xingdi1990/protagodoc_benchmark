@@ -25,15 +25,9 @@ from typing import Dict, List, Tuple
 from pypdf import PdfReader
 from tqdm import tqdm
 
-try:
-    from .report import generate_html_report
-    from .tests import BaselineTest, BasePDFTest, load_tests, save_tests
-    from .utils import calculate_bootstrap_ci
-except ImportError:
-    # Fallback for standalone execution
-    from report import generate_html_report
-    from tests import BaselineTest, BasePDFTest, load_tests, save_tests
-    from utils import calculate_bootstrap_ci
+from .report import generate_html_report
+from .tests import BaselineTest, BasePDFTest, load_tests, save_tests
+from .utils import calculate_bootstrap_ci
 
 
 def evaluate_candidate(
