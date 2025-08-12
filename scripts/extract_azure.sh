@@ -30,7 +30,7 @@ for pdf_file in "$PDF_DIR"/*.pdf; do
         echo "[$count/$file_count] Processing: $filename"
         
         # Run Azure script
-        python azure_markdown.py "$pdf_file" "$OUTPUT_DIR"
+        python scripts/azure_markdown.py "$pdf_file" "$OUTPUT_DIR"
         
         echo ""
     fi
