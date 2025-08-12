@@ -23,17 +23,35 @@ echo ""
 
 # Process each PDF file
 count=0
+skipped=0
 for pdf_file in "$PDF_DIR"/*.pdf; do
     if [[ -f "$pdf_file" ]]; then
         count=$((count + 1))
         filename=$(basename "$pdf_file")
-        echo "[$count/$file_count] Processing: $filename"
+        basename_no_ext="${filename%.pdf}"
         
-        # Run Azure script
-        python scripts/azure_markdown.py "$pdf_file" "$OUTPUT_DIR"
+        # Check if pkl file already exists in any azure_pkl_* directory
+        pkl_exists=false
+        for azure_dir in "$OUTPUT_DIR"/azure_pkl_*/; do
+            if [[ -d "$azure_dir" && -f "$azure_dir/${basename_no_ext}.pkl" ]]; then
+                pkl_exists=true
+                break
+            fi
+        done
         
-        echo ""
+        if [[ "$pkl_exists" == true ]]; then
+            echo "[$count/$file_count] Skipping: $filename (already processed)"
+            skipped=$((skipped + 1))
+        else
+            echo "[$count/$file_count] Processing: $filename"
+            
+            # Run Azure script
+            python azure_markdown.py "$pdf_file" "$OUTPUT_DIR"
+            
+            echo ""
+        fi
     fi
 done
 
 echo "Processing complete!"
+echo "Summary: Processed $((count - skipped)) files, Skipped $skipped files"
