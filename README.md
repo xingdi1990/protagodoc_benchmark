@@ -13,7 +13,7 @@ conda create --name benchmark python=3.10
 conda activate benchmark
 
 # Install the benchmark system
-pip install -e .[bench]
+pip install -e .
 ```
 
 ### 2. Run Your First Benchmark

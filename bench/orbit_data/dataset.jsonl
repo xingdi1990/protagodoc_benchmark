@@ -1,1 +1,14 @@
-{"pdf": "samples.pdf", "page": 1, "id": "multi_column_miss_10", "type": "present", "checked": "verified", "text": "従業員の状況"}
+{"pdf":"samples.pdf","page":1,"id":"samples_table_b615c037","type":"table","cell":"3,891","up":"215","left":"従業員数（人）","top_heading":"従業員数（人）","left_heading":"合計"}
+{"pdf":"samples.pdf","page":1,"id":"samples_math_4c7928b4","type":"math","math":"3,676 + 215 = 3,891"}
+{"pdf":"samples.pdf","page":1,"id":"samples_present_aeee2e10","type":"present","text":"当社には、労働組合は存在しませんが、労使関係は円満に推移しております。","max_diffs":1}
+{"pdf":"samples.pdf","page":1,"id":"samples_table_745afd3d","type":"table","cell":"3,676","down":"215","left":"従業員数（人）","top_heading":"従業員数（人）","left_heading":"毛髪関連事業"}
+{"pdf":"samples.pdf","page":1,"id":"samples_order_811ffa79","type":"order","before":"当社グループにおいて毛髪関連事業に関する従業員をセグメントに区分することが困難なため、従業員数をセグメントごとに示すことはしておりません。","after":"従業員数は従業員数人であり、臨時雇用者数パートタイマー、派遣社員、契約社員、嘱託社員を含みます。","max_diffs":3}
+{"pdf":"samples.pdf","page":1,"id":"samples_math_22dd846b","type":"math","math":"362 \\times 0.185 = 67"}
+{"pdf":"samples.pdf","page":1,"id":"samples_math_a36853e1","type":"math","math":"2,408 \\div 2,623 = 0.918"}
+{"pdf":"samples.pdf","page":1,"id":"samples_absent_ca82b89d","type":"absent","text":"EDINET提出書類"}
+{"pdf":"samples.pdf","page":1,"id":"samples_table_7d286550","type":"table","cell":"215","up":"3,676","down":"3,891","left":"従業員数（人）","top_heading":"従業員数（人）","left_heading":"全社(共通)"}
+{"pdf":"samples.pdf","page":1,"id":"samples_table_7c811629","type":"table","cell":"362人","up":"2,623人","left":"管理職","right":"67人（18.5%）","top_heading":"全体","left_heading":"管理職"}
+{"pdf":"samples.pdf","page":1,"id":"samples_order_7d458250","type":"order","before":"当社グループは、受託計画中や老人枠の定員等における多様性の確保等に係る審査資料を配布しており、各指標の内訳は以下の通りとなります。","after":"女性管理職比率の現状（2023年3月31日現在）は次表の通りであり、自主的かつ測定可能な目標として、2023年3月期と女性管理職（課長職を含む）の割合を22.0%以上に引き上げる方針です。","max_diffs":4}
+{"pdf":"samples.pdf","page":1,"id":"samples_table_873be711","type":"table","cell":"2,623人","down":"362人","left":"社員","right":"1,575人（60.0%）","top_heading":"全体","left_heading":"社員"}
+{"pdf":"samples.pdf","page":1,"id":"samples_math_6a8917e5","type":"math","math":"2,623 \\times 0.6 = 1,575"}
+{"pdf":"samples.pdf","page":1,"id":"samples_math_dfdcd8c0","type":"math","math":"9 \\times 0.222 = 2"}

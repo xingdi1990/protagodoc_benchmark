@@ -1,26 +1,37 @@
 # Core benchmark dependencies
-numpy
+numpy>=1.21.0
 scipy
 pandas
-tqdm
+tqdm>=4.64.0
 playwright
-beautifulsoup4
-difflib
+beautifulsoup4>=4.11.0
+# difflib
 matplotlib
 seaborn
 
 # Table extraction and comparison
 tabulate
 fuzzywuzzy
+rapidfuzz>=3.0.0
+fuzzysearch>=0.7.0
 python-levenshtein
 
 # PDF processing
 PyPDF2
+pypdf>=3.0.0
 pdfplumber
+PyMuPDF>=1.23.0  # For PDF to image conversion in dataset generator
+Pillow>=9.0.0
+
+# Dataset generation with GPT-4o
+openai>=1.0.0
+
+# XML parsing for MathML
+lxml>=4.9.0
 
 # Optional: Azure Document Intelligence (if needed later)
-# python-dotenv
-# azure-ai-documentintelligence
+python-dotenv
+azure-ai-documentintelligence
 
 # MinerU (install separately as it has complex dependencies)
 # Follow MinerU installation guide: https://github.com/opendatalab/MinerU
