@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 
 from tqdm import tqdm
 
-from olmocr.data.renderpdf import render_pdf_to_base64webp
+from data.renderpdf import render_pdf_to_base64webp
 
 from .tests import BasePDFTest
 
