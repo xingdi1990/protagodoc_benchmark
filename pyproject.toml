@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "protagodoc-benchmark"
+version = "1.0.0"
+description = "Document OCR and Table Extraction Benchmark Framework"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+
+dependencies = [
+    "numpy",
+    "scipy", 
+    "pandas",
+    "tqdm",
+    "pypdf",
+    "beautifulsoup4",
+    "fuzzywuzzy",
+    "python-levenshtein",
+    "tabulate",
+    "fuzzysearch",
+    "attrs",
+]
+
+[project.optional-dependencies]
+bench = [
+    "playwright",
+    "matplotlib",
+    "seaborn",
+]
+
+azure = [
+    "python-dotenv",
+    "azure-ai-documentintelligence",
+]
+
+[project.scripts]
+protagodoc-benchmark = "bench.benchmark:main"
+protagodoc-convert = "bench.convert:main"
+
+[tool.setuptools.packages.find]
+include = ["bench*"]

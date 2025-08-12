@@ -1,0 +1,26 @@
+# Core benchmark dependencies
+numpy
+scipy
+pandas
+tqdm
+playwright
+beautifulsoup4
+difflib
+matplotlib
+seaborn
+
+# Table extraction and comparison
+tabulate
+fuzzywuzzy
+python-levenshtein
+
+# PDF processing
+PyPDF2
+pdfplumber
+
+# Optional: Azure Document Intelligence (if needed later)
+# python-dotenv
+# azure-ai-documentintelligence
+
+# MinerU (install separately as it has complex dependencies)
+# Follow MinerU installation guide: https://github.com/opendatalab/MinerU
