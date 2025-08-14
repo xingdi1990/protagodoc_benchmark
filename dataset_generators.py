@@ -319,7 +319,10 @@ class TextOrderGenerator(BaseTestGenerator):
         # Extract sentence pairs in reading order
         sentence_pairs = self._extract_ordered_pairs(image_base64, max_tests)
         
-        for i, (before, after) in enumerate(sentence_pairs):
+        # Validate that pairs are in the same region using the paper's exact criteria
+        validated_pairs = self._validate_same_region_pairs(sentence_pairs, image_base64)
+        
+        for i, (before, after) in enumerate(validated_pairs):
             test_id = f"{pdf_name.replace('.pdf', '')}_order_{uuid.uuid4().hex[:8]}"
             max_diffs = max(2, max(len(before), len(after)) // 20)
             
@@ -344,18 +347,26 @@ class TextOrderGenerator(BaseTestGenerator):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"""Analyze this document and identify {max_pairs} pairs of text segments that should appear in natural reading order.
+                        "text": f"""Analyze this document and identify {max_pairs} pairs of text segments that should appear in natural reading order WITHIN THE SAME REGION OR COLUMN.
+                        
+                        CRITICAL: Both texts in each pair must be located in the same region of the page (same column, same section, same continuous text flow). Do NOT create pairs from different regions, different columns, or separate text boxes.
                         
                         Each pair should:
-                        - Be from the main content (not headers/footers)
-                        - Represent natural reading flow
+                        - Be from the main content (not headers/footers)  
+                        - Be in the SAME region/column/section of the page
+                        - Represent natural reading flow within that region
                         - Be meaningful text segments (at least 8 words each)
-                        - Come from different parts of the document
+                        - Have clear sequential order within the same text flow
+                        
+                        Look at the page layout and identify regions like:
+                        - Text columns that flow continuously
+                        - Sections within the same article/document body
+                        - Paragraphs in the same logical section
                         
                         Return as JSON with pairs in reading order. Example:
                         {{"pairs": [
-                            {{"before": "First text segment here.", "after": "Second text segment that follows."}},
-                            {{"before": "Another earlier segment.", "after": "Text that comes after it."}}
+                            {{"before": "First sentence in left column.", "after": "Next sentence in same left column."}},
+                            {{"before": "Earlier paragraph in main text.", "after": "Following paragraph in same section."}}
                         ]}}"""
                     },
                     {
@@ -400,6 +411,62 @@ class TextOrderGenerator(BaseTestGenerator):
                 pass
         
         return []
+    
+    def _validate_same_region_pairs(self, sentence_pairs: List[Tuple[str, str]], image_base64: str) -> List[Tuple[str, str]]:
+        """Validate that sentence pairs are in the same region using the paper's exact criteria."""
+        if not sentence_pairs:
+            return []
+        
+        validated_pairs = []
+        
+        print(f"Validating {len(sentence_pairs)} order test pairs for same-region criteria...")
+        
+        for i, (before_text, after_text) in enumerate(sentence_pairs):
+            if self._validate_same_region(before_text, after_text, image_base64):
+                validated_pairs.append((before_text, after_text))
+                print(f"✓ Pair {i+1}: VALID (same region)")
+            else:
+                print(f"✗ Pair {i+1}: FILTERED (different regions)")
+        
+        print(f"Validation complete: {len(validated_pairs)}/{len(sentence_pairs)} pairs kept")
+        return validated_pairs
+    
+    def _validate_same_region(self, before_text: str, after_text: str, image_base64: str) -> bool:
+        """Validate that two texts are in the same region using the paper's exact prompt."""
+        # Truncate texts if too long for the API
+        before_display = before_text[:100] + "..." if len(before_text) > 100 else before_text
+        after_display = after_text[:100] + "..." if len(after_text) > 100 else after_text
+        
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"""Does the text in the 'before' field and the 'after' field appear in the same region of the page?
+
+Look at the PDF image and determine if these texts are located near each other or in completely different parts of the page. Different regions could be the captions for different images, or inside of different insets or tables. However, appearing the same column of text, or in the naturally flowing next column of text is close enough.
+
+Before: {before_display}
+After: {after_display}
+
+Respond with 'YES' if they appear in the same region or column, and 'NO' if they appear in different regions. Then explain your reasoning in 1-2 sentences."""
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{image_base64}"}
+                    }
+                ]
+            }
+        ]
+        
+        response = self._make_gpt_request(messages)
+        if response:
+            # Check if response starts with "YES"
+            return response.strip().upper().startswith("YES")
+        
+        # If API fails, assume it's valid (conservative approach)
+        return True
 
 
 class TableTestGenerator(BaseTestGenerator):

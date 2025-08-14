@@ -100,7 +100,7 @@ class DatasetGenerator:
                     )
                     page_tests.extend(presence_tests)
 
-                    # Reading order tests (disabled)
+                    # Reading order tests
                     order_tests = self.generators['text_order'].generate_tests(
                         pdf_path, 1, image_base64, max_tests_per_type
                     )
@@ -150,7 +150,7 @@ class DatasetGenerator:
                     )
                     page_tests.extend(presence_tests)
 
-                    # Reading order tests (disabled)
+                    # Reading order tests
                     order_tests = self.generators['text_order'].generate_tests(
                         pdf_path, page_num, image_base64, max_tests_per_type
                     )
