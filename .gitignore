@@ -187,3 +187,5 @@ Thumbs.db
 *.dat
 
 datasets/
+olmOCR-bench/
+orbit_data/

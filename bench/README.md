@@ -14,10 +14,6 @@ olmOCR-bench operates on single page PDFs directly. We make this choice because 
 We have run the benchmark against some contemporary OCR pipelines, but it is really easy 
 to run it against your own OCR tools. Your tool just needs to support Markdown or plain text output.
 
-<div align="center">
-  <img src="https://github.com/allenai/olmocr/blob/main/scripts/pareto/ocr_pareto.png?raw=true" width=800/>
-</div>
-
 ## Results
 
 <table>
@@ -36,6 +32,18 @@ to run it against your own OCR tools. Your tool just needs to support Markdown o
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td align="left">MinerU v2.1.10</td>
+      <td align="center">75.7</td>
+      <td align="center">48.9</td>
+      <td align="center">57.6</td>
+      <td align="center">19.2</td>
+      <td align="center"><strong>97.5</strong></td>
+      <td align="center">58.9</td>
+      <td align="center">42.1</td>
+      <td align="center">97.6</td>
+      <td align="center">62.2 ± 1.0</td>
+    </tr>
     <tr>
       <td align="left">GOT OCR</td>
       <td align="center">52.7</td>
@@ -66,7 +74,7 @@ to run it against your own OCR tools. Your tool just needs to support Markdown o
       <td align="center">47.4</td>
       <td align="center">60.9</td>
       <td align="center">17.3</td>
-      <td align="center"><strong>96.6</strong></td>
+      <td align="center">96.6</td>
       <td align="center">59.0</td>
       <td align="center">39.1</td>
       <td align="center">96.6</td>
@@ -278,11 +286,9 @@ https://huggingface.co/datasets/allenai/olmOCR-bench
 
 To run a benchmark, first install the bench requirements
 ```bash
-conda create -n olmocr python=3.11
-conda activate olmocr
+conda create -n protago_bench python=3.11
+conda activate protago_bench
 
-git clone https://github.com/allenai/olmocr.git
-cd olmocr
 
 # Install olmocr and the requirements needed to run the benchmark
 pip install -e .[bench]
@@ -321,3 +327,46 @@ We have an internal data annotation tool that can be used to review the question
 ```bash
 python -m olmocr.bench.review_app --port 5000 --debug ./olmOCR-bench/bench_data/multi_column.jsonl --force
 ```
+
+# Protago-Benchmark
+## Dataset Overview
+- **Total files processed:** 206,040
+- **Files with detected languages:** 199,803  
+- **Files with unknown language:** 6,237 (excluded)
+- **Total files sampled:** 195
+
+---
+
+## Language Distribution (Before Sampling)
+
+### Top Languages (≥ 0.1% representation)
+
+| Language | Files | Percentage | Visual Bar |
+|----------|-------|------------|------------|
+| 🇨🇳 Chinese (zh) | 84,858 | 42.5% | ████████████████████████████████████████████ |
+| 🇺🇸 English (en) | 76,592 | 38.3% | ██████████████████████████████████████████ |
+| 🇯🇵 Japanese (ja) | 25,250 | 12.6% | ██████████████ |
+| 🇸🇪 Swedish (sv) | 2,029 | 1.0% | █ |
+| 🇩🇰 Danish (da) | 1,549 | 0.8% | █ |
+| 🇫🇷 French (fr) | 1,506 | 0.8% | █ |
+| 📜 Latin (la) | 1,494 | 0.7% | █ |
+| 🇫🇮 Finnish (fi) | 960 | 0.5% | ▌ |
+| 🇰🇷 Korean (ko) | 823 | 0.4% | ▌ |
+| 🇹🇭 Thai (th) | 770 | 0.4% | ▌ |
+| 🇪🇹 Amharic (am) | 754 | 0.4% | ▌ |
+| 🇮🇩 Indonesian (id) | 752 | 0.4% | ▌ |
+| 🇱🇦 Lao (lo) | 574 | 0.3% | ▌ |
+| 🇮🇸 Icelandic (is) | 382 | 0.2% | ▌ |
+| 🇵🇪 Quechua (qu) | 226 | 0.1% | ▌ |
+| 🇦🇲 Armenian (hy) | 188 | 0.1% | ▌ |
+
+### Additional Languages (< 0.1% each)
+*60 additional languages detected with smaller representations*
+
+**Notable mentions:**
+- Portuguese (pt): 90 files
+- German (de): 17 files  
+- Spanish (es): 29 files
+- Italian (it): 15 files
+- Arabic (ar): 5 files
+- Hindi (hi): 47 files

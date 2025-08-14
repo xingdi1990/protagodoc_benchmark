@@ -593,7 +593,9 @@ class TextOrderTest(BasePDFTest):
         if not self.after.strip():
             raise ValidationError("After field cannot be empty")
         if self.max_diffs > len(self.before) // 2 or self.max_diffs > len(self.after) // 2:
-            raise ValidationError("Max diffs is too large for this test, greater than 50% of the search string")
+            raise ValidationError(f"Max diffs is too large for this test, greater than 50% of the search string. "
+                                f"Test ID: {self.id}, PDF: {self.pdf}, Page: {self.page}, "
+                                f"max_diffs: {self.max_diffs}, before_len: {len(self.before)}, after_len: {len(self.after)}")
 
     def run(self, md_content: str) -> Tuple[bool, str]:
         md_content = normalize_text(md_content)

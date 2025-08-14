@@ -133,30 +133,35 @@ class TextPresenceGenerator(BaseTestGenerator):
         if not sentences:
             return tests
         
-        # Generate presence tests
-        presence_count = max_tests // 2
-        selected_sentences = random.sample(sentences, min(presence_count, len(sentences)))
-        
-        for i, sentence in enumerate(selected_sentences):
-            # Clean and truncate sentence
+        # Generate presence tests: treat max_tests as per-label budget
+        presence_budget = max_tests
+        presence_candidates = list(sentences)
+        random.shuffle(presence_candidates)
+
+        present_added = 0
+        for sentence in presence_candidates:
+            if present_added >= presence_budget:
+                break
             clean_sentence = self._clean_sentence(sentence)
-            if len(clean_sentence) < 10:  # Skip very short sentences
+            if len(clean_sentence) < 10:
                 continue
-                
+
             test_id = f"{pdf_name.replace('.pdf', '')}_present_{uuid.uuid4().hex[:8]}"
-            max_diffs = max(1, len(clean_sentence) // 20)  # Allow ~5% character differences
-            
+            max_diffs = max(1, len(clean_sentence) // 20)
+
             tests.append({
                 "pdf": pdf_name,
                 "page": page_num,
                 "id": test_id,
                 "type": "present",
                 "text": clean_sentence,
-                "max_diffs": max_diffs
+                "max_diffs": max_diffs,
+                "checked": "unverified"
             })
-        
-        # Generate absence tests (headers/footers/page numbers)
-        absence_tests = self._generate_absence_tests(pdf_path, page_num, image_base64, max_tests - len(tests))
+            present_added += 1
+
+        # Generate absence tests (headers/footers/page numbers): independent per-label budget
+        absence_tests = self._generate_absence_tests(pdf_path, page_num, image_base64, max_tests)
         tests.extend(absence_tests)
         
         return tests
@@ -231,7 +236,8 @@ class TextPresenceGenerator(BaseTestGenerator):
                 "page": page_num,
                 "id": test_id,
                 "type": "absent",
-                "text": text
+                "text": text,
+                "checked": "unverified"
             })
         
         return tests
@@ -324,7 +330,8 @@ class TextOrderGenerator(BaseTestGenerator):
                 "type": "order",
                 "before": before,
                 "after": after,
-                "max_diffs": max_diffs
+                "max_diffs": max_diffs,
+                "checked": "unverified"
             })
         
         return tests
@@ -412,20 +419,25 @@ class TableTestGenerator(BaseTestGenerator):
         relationships = self._generate_table_relationships(image_base64, table_data, max_tests)
         
         for i, rel in enumerate(relationships):
-            test_id = f"{pdf_name.replace('.pdf', '')}_table_{uuid.uuid4().hex[:8]}"
+            # Create ID in format: filename_table_##
+            test_id = f"{pdf_name.replace('.pdf', '')}_table_{i:02d}"
             
             test = {
                 "pdf": pdf_name,
                 "page": page_num,
                 "id": test_id,
                 "type": "table",
+                "max_diffs": 0,
+                "checked": "unverified",
                 "cell": rel["cell"]
             }
             
-            # Add relationship properties
+            # Add all relationship properties, setting to null if not present
             for key in ["up", "down", "left", "right", "top_heading", "left_heading"]:
-                if key in rel and rel[key]:
-                    test[key] = rel[key]
+                test[key] = rel.get(key, None)
+            
+            # Add URL field (set to null since we don't have source URLs)
+            test["url"] = None
             
             tests.append(test)
         
@@ -493,17 +505,19 @@ class TableTestGenerator(BaseTestGenerator):
                         "type": "text",
                         "text": f"""Generate {max_tests} table relationship tests from the tables in this document.
                         
-                        For each test, identify a cell and its relationship to other cells:
-                        - up/down: cells directly above/below
-                        - left/right: cells directly to the left/right
-                        - top_heading: column header for this cell
-                        - left_heading: row header for this cell
+                        For each test, identify a cell and its relationship to other cells. IMPORTANT: You must provide ALL relationship fields for each cell, using null for missing relationships:
+                        - up/down: cells directly above/below (null if no cell exists)
+                        - left/right: cells directly to the left/right (null if no cell exists)  
+                        - top_heading: column header for this cell (null if no header)
+                        - left_heading: row header for this cell (null if no header)
                         
-                        Return as JSON array. Example:
-                        [
-                            {{"cell": "3.32T", "left": "3.71T", "top_heading": "Words"}},
-                            {{"cell": "arXiv", "right": "47.2B", "top_heading": "Source"}}
-                        ]"""
+                        Return as JSON with explicit null values. Example:
+                        {{
+                            "relationships": [
+                                {{"cell": "3.32T", "up": null, "down": "2.1T", "left": "3.71T", "right": null, "top_heading": "Words", "left_heading": null}},
+                                {{"cell": "arXiv", "up": "Sources", "down": null, "left": null, "right": "47.2B", "top_heading": "Source", "left_heading": "Dataset"}}
+                            ]
+                        }}"""
                     },
                     {
                         "type": "image_url",
@@ -526,14 +540,14 @@ class TableTestGenerator(BaseTestGenerator):
                                 "type": "object",
                                 "properties": {
                                     "cell": {"type": "string"},
-                                    "up": {"type": "string"},
-                                    "down": {"type": "string"},
-                                    "left": {"type": "string"},
-                                    "right": {"type": "string"},
-                                    "top_heading": {"type": "string"},
-                                    "left_heading": {"type": "string"}
+                                    "up": {"type": ["string", "null"]},
+                                    "down": {"type": ["string", "null"]},
+                                    "left": {"type": ["string", "null"]},
+                                    "right": {"type": ["string", "null"]},
+                                    "top_heading": {"type": ["string", "null"]},
+                                    "left_heading": {"type": ["string", "null"]}
                                 },
-                                "required": ["cell"]
+                                "required": ["cell", "up", "down", "left", "right", "top_heading", "left_heading"]
                             }
                         }
                     },
@@ -572,7 +586,8 @@ class MathTestGenerator(BaseTestGenerator):
                 "page": page_num,
                 "id": test_id,
                 "type": "math",
-                "math": equation
+                "math": equation,
+                "checked": "unverified"
             })
         
         return tests

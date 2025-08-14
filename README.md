@@ -21,9 +21,6 @@ pip install -e .
 ```bash
 # Test with sample data (mock results included)
 python -m bench.benchmark --dir bench/sample_data --candidate marker --force
-
-# # Convert PDFs with MinerU (when installed)
-# python -m bench.convert mineru --dir bench/sample_data
 ```
 
 ## 📊 Benchmark System

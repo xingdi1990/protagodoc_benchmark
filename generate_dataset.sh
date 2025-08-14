@@ -13,4 +13,17 @@
 # python generate_dataset.py --pdf_dir /path/to/pdfs --output dataset.jsonl --model gpt-4-turbo
 
 
-python generate_dataset.py --pdf_dir bench/orbit_data/pdfs --output dataset.jsonl --api_key $OPENAI_API_KEY
+
+# python scripts/split_pdfs_by_page.py --input-dir datasets/orbit_v1/pdf --output-dir bench/orbit_data/pdfs_by_pages
+# python scripts/split_pdfs_by_page.py --input-dir datasets/orbit_v2/pdf --output-dir bench/orbit_data/pdfs_by_pages
+# python scripts/split_pdfs_by_page.py --input-dir datasets/orbit_v3/pdf --output-dir bench/orbit_data/pdfs_by_pages
+
+python scripts/split_pdfs_by_page.py --input-dir datasets/cornercase --output-dir bench/orbit_data/pdfs_by_pages
+
+python scripts/filter_language.py --input-dir bench/orbit_data/pdfs_by_pages \
+    --output-dir bench/orbit_data/pdfs \
+    --samples-per-language 3 \
+    --max-files 100 \
+    --seed 777
+
+python generate_dataset.py --pdf_dir bench/orbit_data/pdfs --output bench/orbit_data --max_tests_per_type 2 --model gpt-4o-2024-08-06

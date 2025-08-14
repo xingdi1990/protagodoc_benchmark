@@ -10,8 +10,8 @@ from functools import partial
 from pypdf import PdfReader
 from tqdm import tqdm
 
-from olmocr.data.renderpdf import render_pdf_to_base64png
-from olmocr.image_utils import convert_image_to_pdf_bytes
+from data.renderpdf import render_pdf_to_base64png
+from image_utils import convert_image_to_pdf_bytes
 
 
 def parse_method_arg(method_arg):
